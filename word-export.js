@@ -308,11 +308,11 @@ export async function exportWord(model) {
     ]
   });
 
-  const blob = await Packer.toBlob(document);
-  const link = document.createElement('a');
+  const blob = await Packer.toBlob(worddocument);
+  const link = window.document.createElement('a');
   link.href = URL.createObjectURL(blob);
   link.download = `${safeName(model.title)}.docx`;
-  document.body.appendChild(link);
+  window.document.body.appendChild(link);
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(link.href), 1000);
