@@ -276,44 +276,53 @@ export async function exportWord(model) {
     }
   }
 
-  const document = new Document({
-    styles: {
-      default: {
-        document: {
-          run: {
-            font: 'Arial',
-            size: 24,
-            color: '000000'
-          },
-          paragraph: {
-            spacing: { line: 300, after: 120 }
-          }
+ const wordDocument = new Document({
+  styles: {
+    default: {
+      document: {
+        run: {
+          font: 'Arial',
+          size: 24,
+          color: '000000'
+        },
+        paragraph: {
+          spacing: { line: 300, after: 120 }
         }
       }
-    },
-    sections: [
-      {
-        properties: {
-          page: {
-            margin: {
-              top: 720,
-              right: 720,
-              bottom: 720,
-              left: 720
-            }
+    }
+  },
+  sections: [
+    {
+      properties: {
+        page: {
+          margin: {
+            top: 720,
+            right: 720,
+            bottom: 720,
+            left: 720
           }
-        },
-        children
-      }
-    ]
-  });
+        }
+      },
+      children
+    }
+  ]
+});
 
-  const blob = await Packer.toBlob(document);
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `${safeName(model.title)}.docx`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-}
+const blob = await Packer.toBlob(wordDocument);
+
+const downloadUrl = URL.createObjectURL(blob);
+
+const link = window.document.createElement('a');
+
+link.href = downloadUrl;
+link.download = `${safeName(model.title)}.docx`;
+
+window.document.body.appendChild(link);
+
+link.click();
+
+link.remove();
+
+setTimeout(() => {
+  URL.revokeObjectURL(downloadUrl);
+}, 1000);
