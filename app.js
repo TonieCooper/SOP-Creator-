@@ -17,7 +17,23 @@ const library=()=>{try{return (JSON.parse(localStorage.getItem('sop-library-v2a'
 function readForm(){fields.forEach(k=>current[k]=$('#'+k).value);current.updatedAt=new Date().toISOString();return current}function fillForm(){fields.forEach(k=>$('#'+k).value=current[k]||'');renderSteps();$('#status').textContent='Opened: '+(current.title||'Untitled SOP')+' | '+(current.category||'Uncategorized')+' | '+(current.version||'Draft')}
 function persist(){readForm();let a=library(),i=a.findIndex(x=>x.id===current.id);if(i<0)a.unshift(current);else a[i]=current;writeLibrary(a);localStorage.setItem('sop-current-id-v2a',current.id);$('#status').textContent='Saved '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});renderHistory()}
 function markPreviewDirty(){const status=$('#previewStatus');if(!status)return;status.textContent='Changes pending';status.className='previewStatus dirty'}
-function schedulePreview(){markPreviewDirty();if(!previewActive)return;clearTimeout(previewTimer);previewTimer=setTimeout(()=>preview(true),650)}
+function schedulePreview() {
+2
+markPreviewDirty();
+3
+ 
+4
+clearTimeout(previewTimer);
+5
+ 
+6
+previewTimer = setTimeout(() => {
+7
+preview(true);
+8
+}, 650);
+9
+}
 function queue(){clearTimeout(timer);timer=setTimeout(persist,350);schedulePreview()}
 function commitAndRefresh(){persist();schedulePreview()}
 function renderSteps(){const host=$('#steps');host.innerHTML='';current.steps.forEach((s,i)=>{const e=document.createElement('div');e.className='step';e.innerHTML=`<div class="stephead"><strong>Step ${i+1}</strong><span><button class="up">Up</button><button class="down">Down</button><button class="delete">Delete</button></span></div><input class="st" placeholder="Step title"><textarea class="si" placeholder="Describe exactly what to click, enter, select, compare, or verify."></textarea><input class="sc" placeholder="Completion check"><label class="upload">${s.image?'<img>':'Select screenshot'}<input hidden type="file" accept="image/*"></label>${s.image?'<div class="caption"><input placeholder="Screenshot caption"><button class="remove">Remove</button></div>':''}`;e.querySelector('.st').value=s.title;e.querySelector('.si').value=s.instruction;e.querySelector('.sc').value=s.check;e.querySelector('.st').oninput=x=>{s.title=x.target.value;queue()};e.querySelector('.si').oninput=x=>{s.instruction=x.target.value;queue()};e.querySelector('.sc').oninput=x=>{s.check=x.target.value;queue()};e.querySelector('.up').onclick=()=>move(i,-1);e.querySelector('.down').onclick=()=>move(i,1);e.querySelector('.delete').onclick=()=>{current.steps=current.steps.length===1?[blankStep()]:current.steps.filter((_,j)=>j!==i);renderSteps();persist()};e.querySelector('input[type=file]').onchange=x=>{const f=x.target.files[0];if(!f?.type.startsWith('image/'))return;const r=new FileReader();r.onload=()=>{s.image=r.result;renderSteps();persist()};r.readAsDataURL(f)};if(s.image){e.querySelector('img').src=s.image;e.querySelector('.caption input').value=s.caption;e.querySelector('.caption input').oninput=x=>{s.caption=x.target.value;queue()};e.querySelector('.remove').onclick=()=>{s.image='';s.caption='';renderSteps();persist()}}host.appendChild(e)})}
