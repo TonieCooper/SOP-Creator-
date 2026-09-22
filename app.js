@@ -17,48 +17,22 @@ const library=()=>{try{return (JSON.parse(localStorage.getItem('sop-library-v2a'
 function readForm(){fields.forEach(k=>current[k]=$('#'+k).value);current.updatedAt=new Date().toISOString();return current}function fillForm(){fields.forEach(k=>$('#'+k).value=current[k]||'');renderSteps();$('#status').textContent='Opened: '+(current.title||'Untitled SOP')+' | '+(current.category||'Uncategorized')+' | '+(current.version||'Draft')}
 function persist(){readForm();let a=library(),i=a.findIndex(x=>x.id===current.id);if(i<0)a.unshift(current);else a[i]=current;writeLibrary(a);localStorage.setItem('sop-current-id-v2a',current.id);$('#status').textContent='Saved '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});renderHistory()}
 function markPreviewDirty(){const status=$('#previewStatus');if(!status)return;status.textContent='Changes pending';status.className='previewStatus dirty'}
-let previewGenerated = false;
-2
- 
-3
-function preview(silent = false) {
-4
- 
-5
-previewGenerated = true;
-6
- 
-7
-...
-8
-}
-9
- 
-10
 function schedulePreview() {
-11
- 
-12
+2
 markPreviewDirty();
-13
+3
  
-14
-if (!previewGenerated)
-15
-return;
-16
- 
-17
+4
 clearTimeout(previewTimer);
-18
+5
  
-19
+6
 previewTimer = setTimeout(() => {
-20
+7
 preview(true);
-21
+8
 }, 650);
-22
+9
 }
 function queue(){clearTimeout(timer);timer=setTimeout(persist,350);schedulePreview()}
 function commitAndRefresh(){persist();schedulePreview()}
